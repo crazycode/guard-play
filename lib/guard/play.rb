@@ -13,7 +13,9 @@ module Guard
           :app_path       => ''
       }.update(options)
 
-      @app_path = options[:app_path]
+      @last_failed  = false
+      @app_path = @options[:app_path]
+      @notify_title =  @app_path.empty? ? "Play!" : "Play! on #{@app_path}"
     end
 
     # Call once when Guard starts. Please override initialize method to init stuff.
@@ -73,13 +75,18 @@ module Guard
       }
 
       if result.empty?
-        UI.info "Guard::Play ALL Tests are Passed."
+        UI.info "Guard::Play ALL Tests Passed."
+        if @last_failed
+          Notifier.notify("All Tests on #{@app_path} are Passed!", :title => @notify_title, :image => :success)
+        end
+        @last_failed  = false
       else
+        @last_failed  = true
         UI.error "Guard::Play Tests Failed!"
+        Notifier.notify(result.join("\n"), :title => "#{@notify_title} Test Failed!", :image => :failed)
         throw :task_has_failed
       end
-      result
     end
-
   end
+
 end
