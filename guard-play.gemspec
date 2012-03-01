@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "guard-play.gemspec",
     "lib/guard/play.rb",
     "lib/guard/play/templates/Guardfile",
     "test/helper.rb",
