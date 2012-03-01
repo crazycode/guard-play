@@ -1,0 +1,5 @@
+guard 'play' do
+  watch(%r{^app/})
+  watch(%r{^conf/})
+  watch(%r{^test/})
+end
