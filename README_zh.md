@@ -44,11 +44,13 @@ Guard需要Ruby运行环境，并通过Bundler进行包管理，为此，需要�
 ---------------------
 
 对于Linux系统：
+
 ```bash
     sudo bundle install --without darwin
 ```
 
 对于Mac用户：
+
 ```bash
     sudo bundle install --without linux
 ```
@@ -72,6 +74,7 @@ guard会进入到每一个Play应用，执行play auto-test，然后静默在后
 
 
 附录
+---
 
 单Play!项目Guardfile样例：
 
