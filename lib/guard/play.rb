@@ -84,7 +84,7 @@ module Guard
 
       if failed_result.empty?
         UI.info "Guard::Play ALL Tests Passed."
-        if had_test_pass
+        if !had_test_pass
           Notifier.notify("NO Test Founded! Maybe build failed!", :title => @notify_title, :image => :failed)
         elsif @last_failed
           Notifier.notify("All Tests on #{@app_path} are Passed!", :title => @notify_title, :image => :success)
