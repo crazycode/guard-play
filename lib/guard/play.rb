@@ -10,12 +10,16 @@ module Guard
     def initialize(watchers = [], options = {})
       super
       @options = {
-          :app_path       => ''
+        :app_path       => '',
+        :http_port      => 29000,  # NOT USE
+        :jpda_port      => 28000   # NOT USE
       }.update(options)
 
       @last_failed  = false
       @app_path = @options[:app_path]
       @notify_title =  @app_path.empty? ? "Play!" : "Play! on #{@app_path}"
+      @cmd_auto_test_deps = "play auto-test #{@app_path} --deps"
+      @cmd_auto_test = "play auto-test #{@app_path}"
     end
 
     # Call once when Guard starts. Please override initialize method to init stuff.
@@ -41,49 +45,55 @@ module Guard
     # This method should be principally used for long action like running all specs/tests/...
     # @raise [:task_has_failed] when run_all has failed
     def run_all
-      run_auto_test("--deps")
+      run_auto_test(@cmd_auto_test_deps)
     end
 
     # Called on file(s) modifications that the Guard watches.
     # @param [Array<String>] paths the changes files or paths
     # @raise [:task_has_failed] when run_on_change has failed
     def run_on_change(paths)
-      run_auto_test()
+      run_auto_test(@cmd_auto_test)
     end
 
     # Called on file(s) deletions that the Guard watches.
     # @param [Array<String>] paths the deleted files or paths
     # @raise [:task_has_failed] when run_on_change has failed
     def run_on_deletion(paths)
-      run_auto_test()
+      run_auto_test(@cmd_auto_test)
     end
 
     private
-    def run_auto_test(opts = "")
+    def run_auto_test(cmd)
       UI.info "Guard::Play runing - play auto-test #{@app_path} #{opts}"
 
-      result = []
-      IO.popen("play auto-test #{@app_path} #{opts}") { |output|
+      failed_result = []
+      had_test_pass = false
+      IO.popen(cmd) { |output|
         output.each_line { |line|
-          if line =~ /(FAILED|errors)/
-            result << line
+          if line =~ /(FAILED|errors|ERROR)/
+            failed_result << line
             UI.error line
           else
             puts "#{line}"
+            if line =~ /PASSED/
+              had_test_pass = true
+            end
           end
         }
       }
 
-      if result.empty?
+      if failed_result.empty?
         UI.info "Guard::Play ALL Tests Passed."
-        if @last_failed
+        if had_test_pass
+          Notifier.notify("NO Test Founded! Maybe build failed!", :title => @notify_title, :image => :failed)
+        elsif @last_failed
           Notifier.notify("All Tests on #{@app_path} are Passed!", :title => @notify_title, :image => :success)
         end
         @last_failed  = false
       else
         @last_failed  = true
         UI.error "Guard::Play Tests Failed!"
-        Notifier.notify(result.join("\n"), :title => "#{@notify_title} Test Failed!", :image => :failed)
+        Notifier.notify(failed_result.join("\n"), :title => "#{@notify_title} Test Failed!", :image => :failed)
         throw :task_has_failed
       end
     end
