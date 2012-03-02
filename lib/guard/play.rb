@@ -64,7 +64,7 @@ module Guard
 
     private
     def run_auto_test(cmd)
-      UI.info "Guard::Play runing - play auto-test #{@app_path} #{opts}"
+      UI.info "Guard::Play runing - #{cmd}"
 
       failed_result = []
       had_test_pass = false
