@@ -18,8 +18,8 @@ module Guard
       @last_failed  = false
       @app_path = @options[:app_path]
       @notify_title =  @app_path.empty? ? "Play!" : "Play! on #{@app_path}"
-      @cmd_auto_test_deps = "play auto-test #{@app_path} --deps"
-      @cmd_auto_test = "play auto-test #{@app_path}"
+      @cmd_auto_test_deps = "cd #{@app_path}; play auto-test --deps; cd -"
+      @cmd_auto_test = "cd #{@app_path}; play auto-test; cd -"
     end
 
     # Call once when Guard starts. Please override initialize method to init stuff.
